@@ -17,4 +17,5 @@ char.thanh: "#166534"
 char.sau: "#8b5a2b"
 char.huy: "#0e7490"
 char.ha: "#db2777"
+cover: bia.jpg
 ---
