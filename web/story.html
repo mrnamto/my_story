@@ -1,0 +1,20 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Truyện</title>
+<link rel="stylesheet" href="style.css"></head><body>
+<div class="app"><header class="top"><div class="brand"><a class="logo" href="./" aria-label="Trang chủ">←</a><div><h1 id="bt"></h1><small id="bs"></small></div></div></header>
+<div class="stage"><div class="split"><div class="pane">
+<section class="card"><h2 class="ch"><span class="ic">i</span>Thông tin</h2><div class="cb"><div class="info"><div class="cover" id="cv"></div><div><h2 id="h"></h2><small id="meta"></small><p id="d"></p><a class="btn" id="go">Đọc</a></div></div></div></section>
+<section class="card"><h2 class="ch"><span class="ic">≡</span>Danh sách chương</h2><div class="cb"><ul class="chl" id="cl"></ul></div></section>
+</div></div></div></div>
+<script src="common.js"></script><script>
+const slug = new URLSearchParams(SEARCH).get('s');
+fetch('index.json').then(r => r.json()).then(d => { const s = d.stories.find(x => x.slug === slug); if (!s) return $('#h').textContent = 'Không tìm thấy truyện';
+  document.title = s.title; $('#bt').textContent = s.title; $('#bs').textContent = d.site.title; $('#h').textContent = s.title;
+  $('#meta').textContent = [s.author, s.genre, s.status, s.chapters.length + ' chương'].filter(Boolean).join(' · ');
+  $('#d').textContent = s.desc || '';
+  $('#cv').setAttribute('style', s.cover ? `background-image:url('stories/${s.slug}/${s.cover}')` : coverStyle(s)); if (!s.cover) $('#cv').textContent = s.title;
+  const l = store.get('last', {})[slug], cur = l || (s.chapters[0] && s.chapters[0].file);
+  $('#go').href = `read.html?s=${slug}&c=${encodeURIComponent(cur)}`; $('#go').textContent = l ? 'Đọc tiếp' : 'Đọc từ đầu';
+  $('#cl').innerHTML = s.chapters.map((c, i) => `<li><a href="read.html?s=${slug}&c=${encodeURIComponent(c.file)}"><span>${esc(c.title)}</span><span class="n">${i + 1}</span></a></li>`).join('');
+});
+</script></body></html>

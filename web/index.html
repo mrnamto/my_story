@@ -1,0 +1,34 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Thư Viện Truyện</title>
+<link rel="stylesheet" href="style.css"></head><body>
+<div class="app"><header class="top"><div class="brand"><div class="logo">📚</div><div><h1 id="bn">Thư Viện Truyện</h1><small id="bs"></small></div></div>
+<div class="se"><input id="q" type="search" placeholder="Tìm truyện, tác giả…" aria-label="Tìm truyện"></div></header>
+<div class="stage"><div class="split"><div class="pane">
+<div id="cont"></div>
+<section class="card" id="gcard" hidden><h2 class="ch"><span class="ic">#</span>Thể loại</h2><div class="cb"><div class="stabs" id="tabs"></div></div></section>
+<section class="card"><h2 class="ch"><span class="ic">≡</span><span id="sec">Truyện</span></h2><div class="cb"><div class="grid" id="grid"></div></div></section>
+</div></div></div></div>
+<script src="common.js"></script><script>
+let DATA, q = '';
+const G = new URLSearchParams(SEARCH).get('g') || '', last = store.get('last', {});
+fetch('index.json').then(r => r.json()).then(d => { DATA = d; document.title = d.site.title; $('#bn').textContent = d.site.title;
+  const all = d.stories, ch = all.reduce((n, s) => n + s.chapters.length, 0);
+  $('#bs').textContent = `${all.length} truyện · ${ch} chương` + (d.site.tagline ? ' · ' + d.site.tagline : '');
+  const gs = [...new Set(all.map(s => s.genre).filter(Boolean))];
+  if (gs.length) { $('#gcard').hidden = false;
+    $('#tabs').innerHTML = ['Tất cả', ...gs].map((g, i) => `<a href="${i ? './?g=' + encodeURIComponent(g) : './'}" class="${(i ? g : '') === G ? 'on' : ''}">${esc(g)}</a>`).join(''); }
+  const ls = store.get('lastStory', null), s = ls && all.find(x => x.slug === ls);
+  if (s) { const f = last[s.slug] || s.chapters[0].file, i = Math.max(0, s.chapters.findIndex(c => c.file === f));
+    $('#cont').innerHTML = `<section class="card" style="--k:#16a34a"><h2 class="ch"><span class="ic">▶</span>Đang đọc dở</h2><div class="cb"><div class="cont"><div class="cover" style="${s.cover ? `background-image:url('stories/${s.slug}/${esc(s.cover)}')` : coverStyle(s)}"></div><div><b>${esc(s.title)}</b><span class="note">Chương ${i + 1}: ${esc(s.chapters[i].title)}</span></div><a class="btn" href="read.html?s=${s.slug}&c=${encodeURIComponent(f)}">Đọc tiếp</a></div></div></section>`; }
+  draw(); });
+$('#q').oninput = e => { q = e.target.value.toLowerCase(); draw(); };
+function draw() {
+  const list = DATA.stories.filter(s => (!G || s.genre === G) && (s.title + ' ' + (s.author || '')).toLowerCase().includes(q));
+  $('#sec').textContent = (G || 'Mới cập nhật') + ' · ' + list.length + ' truyện';
+  $('#grid').innerHTML = list.map(s => {
+    const bg = s.cover ? `background-image:url('stories/${s.slug}/${esc(s.cover)}')` : coverStyle(s);
+    return `<a class="item" href="story.html?s=${s.slug}"><div class="cover" style="${bg}">${s.cover ? '' : esc(s.title)}${s.status ? `<span class="badge">${esc(s.status)}</span>` : ''}</div><h3>${esc(s.title)}</h3>
+      <small>${s.chapters.length} chương${s.author ? ' · ' + esc(s.author) : ''}</small><small>Cập nhật ${ago(s.updated)}</small></a>`;
+  }).join('') || '<div class="empty">Không có truyện nào khớp.</div>';
+}
+</script></body></html>
