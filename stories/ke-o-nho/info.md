@@ -18,4 +18,8 @@ char.sau: "#8b5a2b"
 char.huy: "#0e7490"
 char.ha: "#db2777"
 cover: bia.jpg
+arc.1: Xa lạ | 1-11
+arc.2: Xa cách | 12-20
+arc.3: Mập mờ | 21-34
+arc.4: Hiểu lầm | 35-50
 ---
